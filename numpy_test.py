@@ -1,4 +1,7 @@
+import pandas as pd
 import numpy as np
+import networkx as nx
+from networkx.algorithms.community import modularity
 
 
 def vector_cos(vertora, vertorb):
@@ -21,11 +24,24 @@ def vector_cos(vertora, vertorb):
 
 
 def euclidean_distance(vertora, vertorb):
+    # 标准化
     vertora = np.asarray(vertora)
     vertorb = np.asarray(vertorb)
     return np.sqrt(np.sum(np.square(vertora-vertorb)))
 
 
+df = pd.read_csv('community_2.csv', encoding='utf-8')
+IG = nx.Graph()
+G = nx.from_pandas_edgelist(df, '实体', '值', '属性')
+N = G.number_of_nodes()
+print(G.nodes())
+label_for_node = dict((i, v) for i, v in enumerate(G.nodes()))
+print(label_for_node)
+communities = dict((i, frozenset([i])) for i in range(N))
+print(communities)
+partition = [[label_for_node[x] for x in c] for c in communities.values()]
+q_cnm = modularity(G, partition)
+print(q_cnm)
 # a = np.zeros((3, 2), dtype=np.int)
 # a[1][0] = 1
 # a[1][1] = 0
