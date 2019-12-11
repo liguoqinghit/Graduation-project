@@ -11,7 +11,7 @@ def delete_column(filename, drop_list):
     """
     df = pd.read_csv(filename, encoding="utf-8")
     drop_list2 = df.columns[drop_list]
-    df.drop(drop_list2, axis=1, inplace=True)
+    df.drop(drop_list2, axis=1, inplace=True, index=True)
     df.to_csv(filename, encoding="utf-8")
     print("删除完毕")
 

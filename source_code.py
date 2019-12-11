@@ -40,15 +40,15 @@ def greedy_modularity_communities(G, weight=None):
     # Count nodes and edges
     N = len(G.nodes())
     m = sum([d.get('weight', 1) for u, v, d in G.edges(data=True)])
-    q0 = 1.0 / (2.0*m)
+    q0 = 1.0 / (2.0 * m)
 
     # Map node labels to contiguous integers
     label_for_node = dict((i, v) for i, v in enumerate(G.nodes()))
     node_for_label = dict((label_for_node[i], i) for i in range(N))
-
+    G = nx.Graph(G)
     # Calculate degrees
-    k_for_label = G.degree(G.nodes(), weight=weight)
-    k = [k_for_label[label_for_node[i]] for i in range(N)]
+    k_for_label = G.degree(G.nodes(), weight=weight)  # [('贡丸', 3), ('猪肉', 2),]
+    k = [k_for_label[label_for_node[i]] for i in range(N)]  # [3, 2, ]
 
     # Initialize community and merge lists
     communities = dict((i, frozenset([i])) for i in range(N))
@@ -57,6 +57,25 @@ def greedy_modularity_communities(G, weight=None):
     # Initial modularity
     partition = [[label_for_node[x] for x in c] for c in communities.values()]
     q_cnm = modularity(G, partition)
+    # print(q_cnm)
+    # 尝试划分，可以直接根据社团划分后计算模块度
+    # 社团添加和社团无联系的点，q值不会发生改变
+    # i = 0
+    # partition = []
+    # temp = []
+    # for community in communities.values():
+    #     if i == 5:
+    #         partition.append(temp)
+    #         temp = []
+    #     i += 1
+    #     for node in community:
+    #         temp.append(label_for_node[node])
+    # partition.append(temp)
+    # print(partition)
+    # partition = [[label_for_node[x] for x in c] for c in communities.values()]
+    # q_cnm = modularity(G, partition)
+    # print(q_cnm)
+    # return
 
     # Initialize data structures
     # CNM Eq 8-9 (Eq 8 was missing a factor of 2 (from A_ij + A_ji)
@@ -64,10 +83,10 @@ def greedy_modularity_communities(G, weight=None):
     # dq_dict[i][j]: dQ for merging community i, j
     # dq_heap[i][n] : (-dq, i, j) for communitiy i nth largest dQ
     # H[n]: (-dq, i, j) for community with nth largest max_j(dQ_ij)
-    a = [k[i]*q0 for i in range(N)]
+    a = [k[i] * q0 for i in range(N)]
     dq_dict = dict(
         (i, dict(
-            (j, 2*q0 - 2*k[i]*k[j]*q0*q0)
+            (j, 2 * q0 - 2 * k[i] * k[j] * q0 * q0)
             for j in [
                 node_for_label[u]
                 for u in G.neighbors(label_for_node[i])]
@@ -83,6 +102,16 @@ def greedy_modularity_communities(G, weight=None):
         for i in range(N)
         if len(dq_heap[i]) > 0])
 
+    # print('输出信息')
+    # print(communities)  # {0: frozenset({0}), }
+    # print(partition)  # [['贡丸'], ['猪肉'], ['科学'], ['生活']]
+    # print(q_cnm)  # -0.009370269247404776
+    # print(a)  # [0.0027573529411764703, 0.001838235294117647, ]
+    # print(dq_dict.items())  # dict_items([(0, {1: 0.0018280979671280277, 2: 0.0018331666306228374, 3: 0.0017013813797577854}), (1, {0: 0.0018280979671280277, 110: 0.0018280979671280277}),])
+    # print(dq_heap[1].h[0])  # 列表 (-0.0018280979671280277, 1, 0)
+    # print(H.h)  # 最小堆，因为放入的是Q的相反数，所以pop出的是Q的最大值 [(-0.0018365457396193772, 7, 8),
+    # print(dq_heap[1].d.items())  # 字典 dict_items([((-0.0018280979671280277, 1, 0), 0), ((-0.0018280979671280277, 1, 110), 1)])
+    # return
     # Merge communities until we can't improve modularity
     while len(H) > 1:
         # Find best merge
@@ -131,10 +160,10 @@ def greedy_modularity_communities(G, weight=None):
             if k in both_set:
                 dq_jk = dq_dict[j][k] + dq_dict[i][k]
             elif k in j_set:
-                dq_jk = dq_dict[j][k] - 2.0*a[i]*a[k]
+                dq_jk = dq_dict[j][k] - 2.0 * a[i] * a[k]
             else:
                 # k in i_set
-                dq_jk = dq_dict[i][k] - 2.0*a[j]*a[k]
+                dq_jk = dq_dict[i][k] - 2.0 * a[j] * a[k]
             # Update rows j and k
             for row, col in [(j, k), (k, j)]:
                 # Save old value for finding heap index
@@ -195,10 +224,9 @@ def greedy_modularity_communities(G, weight=None):
         # Merge i into j and update a
         a[j] += a[i]
         a[i] = 0
+        # print(q_cnm)
 
     communities = [
         frozenset([label_for_node[i] for i in c])
         for c in communities.values()]
     return sorted(communities, key=len, reverse=True)
-
-
