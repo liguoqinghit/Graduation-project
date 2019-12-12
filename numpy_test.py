@@ -50,10 +50,10 @@ def standardized_euclidean_distance(vertora, vertorb, v):
         return a
 
 
-def two_dimensional_list_to_file(filename, communities):
+def two_dimensional_list_to_file(filename, communities: list):
     with open(filename, 'w', encoding='utf-8') as f:
         for community in communities:
-            for node in community:
+            for node in sorted(community):
                 f.write(str(node) + ' ')
             f.write('\n')
 
@@ -77,11 +77,11 @@ def two_dimensional_list_to_file(filename, communities):
 # a = np.array([1, 1])
 # b = np.array([2, 2])
 # print(euclidean_distance(a, b)/2)
-# df = pd.read_csv('community_2.csv', encoding='utf-8')
+# df = pd.read_csv('community_2_index.csv', encoding='utf-8')
 # IG = nx.Graph()
 # G = nx.from_pandas_edgelist(df, '实体', '值', '属性')
 # c = source_code.greedy_modularity_communities(G)
-# two_dimensional_list_to_file('原社团划分.txt', c)
+# two_dimensional_list_to_file('原社团划分(index).txt', c)
 # N = G.number_of_nodes()
 # print(G.nodes())
 # label_for_node = dict((i, v) for i, v in enumerate(G.nodes()))
