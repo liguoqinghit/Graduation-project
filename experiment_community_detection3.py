@@ -71,7 +71,7 @@ G = nx.from_pandas_edgelist(df, '实体', '值', '属性')
 # 原社团划分
 """
 c = source_code.greedy_modularity_communities(G)
-numpy_test.two_dimensional_list_to_file('原社团划分.txt', c)
+numpy_test.two_dimensional_list_to_file('原社团划分(实体).txt', c)
 t2 = time.process_time()
 print('结束:', t2-t1)  # 0.078125
 """

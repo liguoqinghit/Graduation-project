@@ -1,6 +1,9 @@
 import numpy as np
 from scipy import spatial
 import math
+import pandas as pd
+import networkx as nx
+import source_code
 
 
 # def vector_cos(vertora, vertorb):
@@ -40,7 +43,7 @@ def euclidean_distance(vertora, vertorb):
 def standardized_euclidean_distance(vertora, vertorb, v):
     # 标准化欧氏距离
     ver = np.array([np.array(vertora), np.array(vertorb)])
-    a = spatial.distance.pdist(ver, 'seuclidean', V=None)
+    a = spatial.distance.pdist(ver, 'seuclidean', v)
     if math.isnan(a):
         return 0
     else:
@@ -51,7 +54,7 @@ def two_dimensional_list_to_file(filename, communities):
     with open(filename, 'w', encoding='utf-8') as f:
         for community in communities:
             for node in community:
-                f.write(node + ' ')
+                f.write(str(node) + ' ')
             f.write('\n')
 
 
@@ -77,6 +80,8 @@ def two_dimensional_list_to_file(filename, communities):
 # df = pd.read_csv('community_2.csv', encoding='utf-8')
 # IG = nx.Graph()
 # G = nx.from_pandas_edgelist(df, '实体', '值', '属性')
+# c = source_code.greedy_modularity_communities(G)
+# two_dimensional_list_to_file('原社团划分.txt', c)
 # N = G.number_of_nodes()
 # print(G.nodes())
 # label_for_node = dict((i, v) for i, v in enumerate(G.nodes()))
