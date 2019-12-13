@@ -11,12 +11,15 @@ def delete_column(filename, drop_list):
     """
     df = pd.read_csv(filename, encoding="utf-8")
     drop_list2 = df.columns[drop_list]
-    df.drop(drop_list2, axis=1, inplace=True, index=True)
+    df.drop(columns=drop_list2, axis=1, inplace=True, index=True)
     df.to_csv(filename, encoding="utf-8")
     print("删除完毕")
 
 
-filename = "community_2.csv"
+filename = "community_3(删除实体相同关系不同的).csv"
 drop_list = [0]
 delete_column(filename, drop_list)
+# df = pd.read_csv(filename, encoding='utf-8')
+# df.drop(columns=df.columns[0], axis=1, inplace=True)
+# df.to_csv(filename, encoding='utf-8', index=False)
 

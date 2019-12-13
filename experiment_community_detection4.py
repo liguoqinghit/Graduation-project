@@ -71,7 +71,8 @@ if __name__ == '__main__':
     # 构建图
     df = pd.read_csv('community_2_index.csv', encoding='utf-8')
     G = nx.from_pandas_edgelist(df, '实体', '值', '属性')
-    all_nodes = G.nodes
+    all_nodes = list(G.nodes)
+    all_edges = list(G.edges)
     df.drop_duplicates(subset=[df.columns[2]], keep='first', inplace=True)
     columns_list = df[df.columns[2]].values.tolist()
     columns_list.append(81)
