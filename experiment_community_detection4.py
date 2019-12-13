@@ -1,3 +1,4 @@
+import random
 import networkx as nx
 import pandas as pd
 import numpy as np
@@ -8,46 +9,42 @@ from concurrent import futures
 from networkx.algorithms.community import modularity
 
 
-def merge_community2(v, w, com, C, RC, D, RD, Q_pre, columns_list, G, p1=0.2, p2=0.8):
+def merge_community2(v, w, com, C, RC, D, RD, columns_list, G, p1=0.2, p2=0.8):
     edge_attr = np.zeros(len(columns_list), dtype=int)
-    flag = False
     for x in com[v]:
         for y in com[w]:
             if G.has_edge(x, y):
                 edge_attr[int(G[x][y]['属性'])] += 1
-                flag = True
-    if flag:
-        time1 = time.process_time()
-        # C
-        C[w] += edge_attr + C[v]
-        # RC
-        rc = np.sum(C[w]) / len(columns_list)
-        RC[w] = np.linspace(rc, rc, len(columns_list))
+    time1 = time.process_time()
+    # C
+    C[w] += edge_attr + C[v]
+    # RC
+    rc = np.sum(C[w]) / len(columns_list)
+    RC[w] = np.linspace(rc, rc, len(columns_list))
 
-        # D RD
-        for k in range(len(com)):
-            if k == w or k == v:
-                continue
-            D[w][k] = numpy_test.standardized_euclidean_distance(C[w], C[k], C)
-            RD[w][k] = numpy_test.standardized_euclidean_distance(RC[w], RC[k], RC)
+    # D RD
+    for k in range(len(com)):
+        if k == w or k == v:
+            continue
+        D[w][k] = numpy_test.standardized_euclidean_distance(C[w], C[k], C)
+        RD[w][k] = numpy_test.standardized_euclidean_distance(RC[w], RC[k], RC)
 
-        # QR
-        qr2 = np.sum(D) - np.sum(RD)
-        time2 = time.process_time()
-        # QM
-        com[w] = frozenset(com[v] | com[w])
-        del com[v]
-        part = [[co for co in community] for community in com.values()]
-        qm2 = modularity(G, part)
-        time3 = time.process_time()
-        # 计算Q
-        Q = p2 * qm2 - p1 * qr2
-        # print('循环内的时间花费')
-        # print('QR:', time2 - time1)
-        # print('QM:', time3 - time2)
-        # print()
-        return Q
-    return Q_pre
+    # QR
+    qr2 = np.sum(D) - np.sum(RD)
+    time2 = time.process_time()
+    # QM
+    com[w] = frozenset(com[v] | com[w])
+    del com[v]
+    part = [[co for co in community] for community in com.values()]
+    qm2 = modularity(G, part)
+    time3 = time.process_time()
+    # 计算Q
+    Q = p2 * qm2 - p1 * qr2
+    # print('循环内的时间花费')
+    # print('QR:', time2 - time1)
+    # print('QM:', time3 - time2)
+    # print()
+    return Q
 
 
 def merge_community_job(vwpair, com, C, RC, D, RD, Q_pre, columns_list, G, ijpair=()):
@@ -59,12 +56,15 @@ def merge_community_job(vwpair, com, C, RC, D, RD, Q_pre, columns_list, G, ijpai
         matrix_rd2 = copy.deepcopy(RD)
         communities2 = copy.deepcopy(com)
         # 社团融合i j
-        q2 = merge_community2(i, j, communities2, matrix_c2, matrix_rc2, matrix_d2, matrix_rd2, Q_pre, columns_list, G)
+        q2 = merge_community2(i, j, communities2, matrix_c2, matrix_rc2, matrix_d2, matrix_rd2, columns_list, G)
         # 选取循环内q的最大值
         if q2 > Q_pre:
             Q_pre = q2
             ijpair = (i, j)
+        else:
+            ijpair = vwpair[random.randint(0, len(vwpair) - 1)]
     return Q_pre, ijpair
+
 
 if __name__ == '__main__':
     t1 = time.time()
@@ -150,7 +150,7 @@ if __name__ == '__main__':
         # 根据循环内最大值，更新社团状态以及全局状态
         if ijpair:
             a, b = ijpair
-            q = merge_community2(a, b, communities, matrix_c, matrix_rc, matrix_d, matrix_rd, q, columns_list, G)
+            q = merge_community2(a, b, communities, matrix_c, matrix_rc, matrix_d, matrix_rd, columns_list, G)
             ignore.append(a)
             # 更新全局q及其对应社团状态
             if q > q_max:
@@ -160,8 +160,6 @@ if __name__ == '__main__':
         #     break
         print('communities len: ', len(communities), time.time() - t3)
         t3 = time.time()
-        if len(communities) == 5:
-            break
     t3 = time.time()
     print('合并社团花费时间:', t3 - t2)
     print(ignore)
