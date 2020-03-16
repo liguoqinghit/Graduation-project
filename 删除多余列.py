@@ -3,6 +3,7 @@ import pandas as pd
 
 def delete_column(filename, drop_list):
     """
+    用于处理csv文件的没有用的列
     删除filename的第几列，列数为drop_list中的数字，从0开始
 
     :param filename:

@@ -2,8 +2,8 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="84eb7f93-0591-41e6-a86f-cd6a91e0fb75" name="192.168.1.102" url="http://192.168.1.118">
-        <fileTransfer host="192.168.1.118" port="21" rootFolder="/data/ftp/lgq">
+      <webServer id="6763ed31-034c-4af0-b0ef-815c21c6c0f3" name="ali" url="http://10.11.1.118">
+        <fileTransfer host="10.11.1.118" port="21" rootFolder="/data/ftp/lgq">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" passiveMode="true" shareSSLContext="true" />
           </advancedOptions>

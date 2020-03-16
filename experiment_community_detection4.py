@@ -41,7 +41,7 @@ def merge_community2(v, w, com, C, RC, D, RD, columns_list, G, p1=0.2, p2=0.8):
     # 计算Q
     Q = p2 * qm2 - p1 * qr2
     # print('循环内的时间花费')
-    # print('QR:', time2 - time1)
+    # print('QR:', qr2, 'time:', time2 - time1)
     # print('QM:', time3 - time2)
     # print()
     return Q
@@ -76,6 +76,7 @@ if __name__ == '__main__':
     df.drop_duplicates(subset=[df.columns[2]], keep='first', inplace=True)
     columns_list = df[df.columns[2]].values.tolist()
     columns_list.append(81)
+    print(len(columns_list))
     communities = dict((i, frozenset([i])) for i in range(len(all_nodes)))
 
     # 初始化状态
